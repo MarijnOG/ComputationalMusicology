@@ -1,6 +1,6 @@
 ---
-title: "index.Rmd"
-author: "Marijn"
+title: "Index"
+author: "Marijn Oude Groeneger"
 date: "2024-02-21"
 output: html_document
 ---
