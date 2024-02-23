@@ -1,0 +1,86 @@
+---
+title: "Lab1"
+author: "Marijn"
+date: "2024-02-14"
+output: html_document
+---
+```{r}
+library(tidyverse)
+library(tidyr)
+library(spotifyr)
+library(plotly)
+library(heatmaply)
+library(ggplot2)
+
+# Floral - Marsh Partition
+# https://open.spotify.com/track/3NrmXanmUQKkbJEUQlgQUv?si=85b12c65cf5d483c
+
+marsh_partition <- get_track_audio_features("3NrmXanmUQKkbJEUQlgQUv?si=85b12c65cf5d483c")
+floral <- get_artist_audio_features("floral")
+
+# STBL Martin Garrix 3ebXMykcMXOcLeJ9xZ17XH
+# ITNOL Martin Garrix 23L5CiUhw2jV1OIMwthR3S
+# DNB 0JI8koDoC5crQbIjhSty59
+# summer days 7Feaw9WAEREY0DUOSXJLOM
+STBL <- get_track_audio_analysis("3ebXMykcMXOcLeJ9xZ17XH")
+STBL <- STBL$segments
+STBL_relevant <- STBL[, c(1, 8)]
+STBL_relevant <- STBL_relevant %>% 
+    unnest(cols = pitches) %>%
+    mutate(index_column = rep(1:12, each = nrow(df_expanded) / 12))
+
+
+```
+
+```{r}
+# Create a heatmap
+ggplot(STBL_relevant, aes(x = start, y = pitches, fill = pitches)) +
+  geom_tile() +
+  scale_fill_viridis_c() +  # You can change the color scale if needed
+  labs(title = "Heatmap of Rows",
+       x = "Segment start",
+       y = "Chroma feature")
+```
+
+
+```{r}
+# My playlist: https://open.spotify.com/playlist/2xMkwo39GHbC6An1SLv3A0?si=678c0e78f22a43f1
+corpus <- get_playlist_audio_features("", "2xMkwo39GHbC6An1SLv3A0?si=38e568f8d86c48a3")
+beatles <- get_playlist_audio_features("", "37i9dQZF1DZ06evO2iBPiw")
+
+
+corpus_relevant <- corpus[c('track.name', 'danceability', 'instrumentalness', 'energy', 'tempo', 'track.artists')]
+beatles_relevant <- beatles[c('track.name', 'danceability', 'instrumentalness', 'energy', 'tempo', 'track.artists')]
+
+
+#This was done with the help of ChatGPT
+corpus_relevant$artist <- lapply(corpus_relevant$track.artists, function(artist) artist$name)
+corpus_relevant <- corpus_relevant[, !(names(corpus_relevant) %in% c('track.artists'))]
+
+beatles_relevant$artist <- lapply(beatles_relevant$track.artists, function(artist) artist$name)
+beatles_relevant <- beatles_relevant[, !(names(beatles_relevant) %in% c('track.artists'))]
+```
+
+```{r}
+ggplot(corpus_relevant, aes(x = danceability, y = tempo, color = energy)) +
+  geom_point(size = 3) +
+  scale_color_continuous(low = "green", high = "red") +
+  geom_text(aes(label = track.name), check_overlap = TRUE, vjust = -1) +
+  scale_y_continuous(limits = c(80, 220)) + 
+  scale_x_continuous(limits = c(0.1, 0.9)) +
+  xlab("Danceability score") +
+  ylab("Tempo (bpm)") +
+  ggtitle("Corpus energy metrics spread")
+
+ggplot(beatles_relevant, aes(x = danceability, y = tempo, color = energy)) +
+  geom_point(size = 3) +
+  scale_color_continuous(low = "green", high = "red") +
+  geom_text(aes(label = track.name), check_overlap = TRUE, vjust = -1) +
+  scale_y_continuous(limits = c(80, 220)) + 
+  scale_x_continuous(limits = c(0.1, 0.9)) +
+  xlab("Danceability score") +
+  ylab("Tempo (bpm)") +
+  ggtitle("Beatles (best of) energy metrics spread")
+```
+
+
