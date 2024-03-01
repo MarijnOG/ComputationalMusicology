@@ -102,7 +102,7 @@ plot_ly_object
 
 Row {data-height=100}
 ------------------------------------------------
-Interestingly, the timbre of the song remains much the same throughout the song.
+Interestingly, the timbre of the track remains much the same throughout the song.This reveals that perceived intensity is minimally reflected in the 'timbre' feature, as there are very noticeable differences in energy throughout the song.
 
 ```{r, include=FALSE}
 TG_CampAdventure <-
