@@ -23,12 +23,6 @@ floral <- get_artist_audio_features("floral")
 # DNB 0JI8koDoC5crQbIjhSty59
 # summer days 7Feaw9WAEREY0DUOSXJLOM
 STBL <- get_track_audio_analysis("3ebXMykcMXOcLeJ9xZ17XH")
-STBL <- STBL$segments
-STBL_relevant <- STBL[, c(1, 8)]
-STBL_relevant <- STBL_relevant %>% 
-    unnest(cols = pitches) %>%
-    mutate(index_column = rep(1:12, each = nrow(df_expanded) / 12))
-
 
 ```
 
