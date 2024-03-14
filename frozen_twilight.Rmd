@@ -1,0 +1,79 @@
+---
+title: "Frozen Twilight - God is an Astronaut"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup}
+library(tidyverse)
+library(spotifyr)
+library(ggplot2)
+library(plotly)
+library(compmus)
+```
+
+Row {data-height=200}
+------------------------------------------------
+A recurrent theme in post rock is repetition itself, as previously mentioned. A nice example thereof is the track "Frozen Twilight" by God is an Astronaut. As this track is over six minutes long and features several sections, one would expect to be able to recognize these when compared to itself at a different time by using a Self-Similarity Matrix (SSM).
+
+Row
+------------------------------------------------
+### Frozen Twilight SSM for Chroma and Timbre
+```{r Frozen Twilight SSM, fig.width=12, fig.height=6}
+# Taken from the example source code provided for this course.
+frozenTwilight <-
+  get_tidy_audio_analysis("6yMlHBgwnIhrF2Qvnt2Yyn") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+
+plot_gg <- bind_rows(
+  frozenTwilight |> 
+    compmus_self_similarity(pitches, "aitchison") |> 
+    mutate(d = d / max(d), type = "Chroma"),
+  frozenTwilight |> 
+    compmus_self_similarity(timbre, "euclidean") |> 
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  facet_wrap(~type) +
+  coord_fixed() +
+  scale_fill_viridis_c(option = "E", guide = "none") + 
+  labs(x = "Time (s)", y = "Time (s)")
+
+
+# Convert ggplot to plotly
+plot_ly_object <- ggplotly(plot_gg)
+
+# Show the interactive plot
+plot_ly_object
+```
+
+Row {data-height=100}
+------------------------------------------------
+Interestingly, the timbre of the track remains much the same throughout the song.This reveals that perceived intensity is minimally reflected in the 'timbre' feature, as there are very noticeable differences in energy throughout the song.

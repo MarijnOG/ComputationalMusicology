@@ -1,0 +1,56 @@
+---
+title: "polyphia_chromagrams"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup}
+library(tidyverse)
+library(spotifyr)
+library(ggplot2)
+library(plotly)
+library(compmus)
+```
+
+Row
+------------------------------------------------
+### Chromagram of the Polyphia track "Light"
+```{r Polyphia Light}
+Light <- get_track_audio_analysis("3YMT7YnliDwUzG3FL4y4kq")
+Light_filtered <- Light$segments
+
+one_through_12 = data.frame(chroma = rep(1:12, length.out = ))
+
+Light_filtered <- Light_filtered[, c(1, 8)] %>% 
+    unnest(cols = pitches)
+Light_filtered = cbind(Light_filtered, one_through_12)
+
+# Create a heatmap
+p3 <- plot_ly(Light_filtered, x = ~factor(start), y = ~factor(chroma), z = ~pitches, type = "heatmap") %>%
+  colorbar(title = "Pitches", tickvals = seq(min(Light_filtered$pitches), max(Light_filtered$pitches), length.out = 5), tickformat = ".2f") %>%
+  layout(title = "Chromagram for Light", xaxis = list(title = "Segment start"), yaxis = list(title = "Chroma feature"))
+
+p3
+```
+
+### Chromagram of the Polyphia track "LIT"
+```{r Polyphia LIT}
+LIT <- get_track_audio_analysis("3RoycW4yhd2HCsWmLR7xIi")
+LIT_filtered <- LIT$segments
+
+LIT_filtered <- LIT_filtered[, c(1, 8)] %>% 
+    unnest(cols = pitches)
+LIT_filtered = cbind(LIT_filtered, one_through_12)
+
+# Create a heatmap
+p4 <- plot_ly(LIT_filtered, x = ~factor(start), y = ~factor(chroma), z = ~pitches, type = "heatmap") %>%
+  colorbar(title = "Pitches", tickvals = seq(min(LIT_filtered$pitches), max(LIT_filtered$pitches), length.out = 5), tickformat = ".2f") %>%
+  layout(title = "Chromagram for LIT", xaxis = list(title = "Segment start"), yaxis = list(title = "Chroma feature"))
+
+p4
+```
+
+Row {data-height=250}
+------------------------------------------------
+These are two versions of the same song, both released by the band Polyphia. The original version, 'Light', features a lot more of the band's original sound, with technical intertwining guitar parts and prog-rock-esque rhythms. In the rerelease, called 'LIT', the band opts for a strongly electronic sound. While the electric guitars are still clearly distinguishable, it is obvious that a lot of studio work has gone into this version of the track. It also features typical elements of dance music, such as opening and closing of filters and compressors, a strong bass drum and background effects to fill up the sound. This last part is interesting, as the chromagram appears a bit more smeared or less distinct in the electronic version. Perhaps these smears over the spectrum are these very effects, as they are often not clearly pitched. Other than that, there appear not to be many major differences.

@@ -1,0 +1,62 @@
+---
+title: "Dancing to the Beatles compared to my corpus"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r}
+library(tidyverse)
+library(spotifyr)
+library(ggplot2)
+library(plotly)
+library(compmus)
+
+
+# My playlist: https://open.spotify.com/playlist/2xMkwo39GHbC6An1SLv3A0?si=678c0e78f22a43f1
+corpus <- get_playlist_audio_features("", "2xMkwo39GHbC6An1SLv3A0?si=38e568f8d86c48a3")
+beatles <- get_playlist_audio_features("", "37i9dQZF1DZ06evO2iBPiw")
+
+
+corpus_relevant <- corpus[c('track.name', 'danceability', 'instrumentalness', 'energy', 'tempo', 'track.artists')]
+beatles_relevant <- beatles[c('track.name', 'danceability', 'instrumentalness', 'energy', 'tempo', 'track.artists')]
+
+
+#This was done with the help of ChatGPT
+corpus_relevant$artist <- lapply(corpus_relevant$track.artists, function(artist) artist$name)
+corpus_relevant <- corpus_relevant[, !(names(corpus_relevant) %in% c('track.artists'))]
+
+beatles_relevant$artist <- lapply(beatles_relevant$track.artists, function(artist) artist$name)
+beatles_relevant <- beatles_relevant[, !(names(beatles_relevant) %in% c('track.artists'))]
+```
+Row {data-height=100}
+------------------------------------------------
+When looking at any corpus of music, an interesting point of debate can be the measure of how easy this music is to dance to, or perhaps, how inclined one naturally feels to move to the rhythm upon hearing a tune. To this end, Spotify provides an API endpoint for previously discussed features, one of which being 'danceability'. To both gain a better understanding of my chosen corpus of music, as well as to gain insight into this parameter, two figures have been displayed.
+
+Row
+------------------------------------------------
+### Corpus energy metric spread
+```{r Corpus energy metrics}
+p1 <- plot_ly(corpus_relevant, x = ~danceability, y = ~tempo, color = ~energy, type = 'scatter', mode = 'markers', text = ~track.name) %>%
+  layout(xaxis = list(title = "Danceability score", range = c(0, 1)),
+         yaxis = list(title = "Tempo (bpm)", range = c(80, 210)),
+         showlegend = TRUE)
+
+p1
+
+#TODO Indicate outliers and their genre (mostly Midwest)
+```
+
+### Beatles (best of) energy metrics spread
+```{r Beatles energy metrics}
+p2 <- plot_ly(beatles_relevant, x = ~danceability, y = ~tempo, color = ~energy, type = 'scatter', mode = 'markers', text = ~track.name) %>%
+  layout(xaxis = list(title = "Danceability score", range = c(0, 1)),
+         yaxis = list(title = "Tempo (bpm)", range = c(80, 210)),
+         showlegend = TRUE)
+
+p2
+```
+
+Row {data-height=100}
+------------------------------------------------
+We can observe that my selected styles of music would serve marginally less well in a dancing hall as compared to the Beatles on average, according to Spotify that is. This also reveals a bit of the bias of this danceability feature, as some of the tracks in my corpus would do fine in, for instance, a more meditative style of dancing. The Beatles also score a bit lower than I would expect, since they have released numerous radio and dance venue hits. This, however, seems to be the nature of this feature. Martin Garrix for example, a renowned Dance DJ/producer, averages around 0.6 'danceability' when looking at his five most popular songs.
