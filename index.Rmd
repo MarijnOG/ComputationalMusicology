@@ -10,7 +10,7 @@ output:
     source: embed
 ---
 
-```{r setup, include=FALSE}
+```{r setup_main, include=FALSE}
 
 library(tidyverse)
 library(spotifyr)
@@ -19,10 +19,6 @@ library(plotly)
 library(compmus)
 ```
 
-Temporary First Page
-================================================
-```{r Frozen Twilight SSM import, child = 'frozen_twilight.Rmd'}
-```
 
 Introduction
 ================================================
@@ -32,7 +28,7 @@ Introduction
 Dancing to the Beatles compared to my corpus
 ================================================
 
-```{r Corpus_Beatles_dance, child = 'corpus_beatles_dance.Rmd'}
+```{r Dance, child = 'corpus_beatles_dance.Rmd'}
 ```
 
 Does Polyphia make Light work, or rather LIT?
@@ -40,7 +36,19 @@ Does Polyphia make Light work, or rather LIT?
 ```{r Polyphia Chromagrams, child = 'polyphia_chromagrams.Rmd'}
 ```
 
-Temporal page
-=================================================
-```{r camp_adventure, child = 'camp_adventure.Rmd'}
+A math rock classic's self similarity
+================================================
+```{r Frozen Twilight SSM, child = 'frozen_twilight.Rmd'}
 ```
+
+Camp Adventure tempograms
+=================================================
+```{r Camp Adventure, child = 'camp_adventure.Rmd'}
+```
+
+Rhythmic Complexity Analyses
+=================================================
+```{r Rhythmic Complexity Analyses, child = 'tempo.Rmd'}
+```
+
+

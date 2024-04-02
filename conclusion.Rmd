@@ -1,0 +1,27 @@
+---
+title: "Conclusion"
+author: "Marijn Oude Groeneger"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup_clustering}
+library(tidyverse)
+library(spotifyr)
+library(plotly)
+library(compmus)
+library(protoclust)
+library(cowplot)
+library(tidymodels)
+library(ggdendro)
+library(heatmaply)
+```
+
+Row {data-height=250}
+------------------------------------------------
+### Conclusion
+In conclusion, the subtle nuances of these subgenres are not a solved problem, and as they are highly subjective, never will be. This is of course a good thing, as, while label serve an important role in any data driven practice like that of (computational) musicology, excessive labelling can kill the spirit of a great work of art, or inhibit the future creation thereof. Several distinct aspects of the genres math rock, post rock and Midwest emo have been discussed and some examples have been provided in the hopes that the reader may obtain a deeper understanding of this topic.
+
+### Contribution
+As for as contribution goes, it is mostly of the broader informative kind. No shocking revelations or peculiar correlations have been found, and most research went into the nature of the Spotify featereset. 

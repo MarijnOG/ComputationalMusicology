@@ -5,7 +5,7 @@ output:
     orientation: rows
 ---
 
-```{r setup}
+```{r setup_polyphia}
 library(tidyverse)
 library(spotifyr)
 library(ggplot2)

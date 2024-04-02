@@ -1,0 +1,74 @@
+---
+title: "Tempo"
+author: "Marijn Oude Groeneger"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup_tempo}
+library(tidyverse)
+library(spotifyr)
+library(ggplot2)
+library(plotly)
+library(compmus)
+
+corpus <- get_playlist_audio_features("", "2xMkwo39GHbC6An1SLv3A0?si=38e568f8d86c48a3")
+corpus_name_id <- select(corpus, track.id, track.name)
+
+ivan <- get_tidy_audio_analysis('14kgsU8JkcXbVAgDSqRRKX')
+
+analysis <- lapply(corpus_name_id$track.id, get_tidy_audio_analysis)
+```
+
+```{r Calculate RMS}
+sections_analysis <- lapply(analysis, function(x) x$sections)
+
+calculate_RMS <- function(df, column_name) {
+  avg <- mean(df[[column_name]])
+  mse <- mean((df[[column_name]] - avg)^2)  # Calculate mean squared error
+  return(sqrt(mse))
+}
+
+tempo_rms <- map(sections_analysis, function(x) calculate_RMS(x[[1]], 'tempo'))
+TS_rms <- map(sections_analysis, function(x) calculate_RMS(x[[1]], 'time_signature'))
+
+corpus_name_id$tempo_rms = as.numeric(tempo_rms)
+corpus_name_id$TS_rms = as.numeric(TS_rms)
+
+```
+Row {data-height=250}
+------------------------------------------------
+### Rhythm and tempo
+As previously mentioned, rhythmic complexity is a defining characteristic for math rock in particular. To this end, this page aims to grant insight in the rhythmic intricacy that many of these tracks feature. To create a measure of 'complexity', the Root Mean Square (RMS) of both the tempo and the time signature features of the Spotify API are compared. Since both of these are not to be entirely taken at face value, combining and averaging them may prove to be a better metric. I considered including the confidence of these values in this figure as well, but that would likely not yield a better result, as it's hard to say whether a low confidence score should increase or decrease perceived complexity (for example, a spoken bridge section may result in hugely complex structure, according to Spotify).
+
+Row 
+------------------------------------------------
+### RMS Comparison
+```{r Plot RMS}
+p <- ggplot(corpus_name_id, aes(x = tempo_rms, y = TS_rms, label = track.name)) +
+  geom_point() +
+  labs(title = "RMS Comparison", x = "Tempo RMS", y = "Time Signature RMS")
+
+# Convert ggplot object to plotly object
+ggplotly(p)
+```
+
+### Spy Dolphin - Delta Sleep
+```{r Spy Dolphin}
+get_tidy_audio_analysis('016MGQqrLrB1SBzEw1mqMl') |> 
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |> 
+  ggplot(aes(x = time, y = bpm, fill = power)) + 
+  geom_raster() + 
+  scale_fill_viridis_c(guide = 'none') +
+  labs(x = 'Time (s)', y = 'Tempo (BPM)') +
+  theme_classic()
+```
+
+Row {data-height=200}
+------------------------------------------------
+### The RMS figure
+This figure shows two possible measures for perceived rhythmic complexity. Noteworthy here is that the spotify algorithm for time signature detection is quite limited, in that it only returns any signature from 3/4 to 7/4, and also isn't very reliable for complex tracks. In the Spotify API, besides actual tempo changes, perceived tempo changes may also mean a new time signature or off-beat rhythm is established, hence why it is included in this figure. 
+
+### A good example
+A particular example is Spy Dolphin - Delta Sleep. Besides being a very well-crafted song (unbiased), it is also interesting in the rhythm department. Most of the song can be counted along in 4/4, though some interesting syncopation may be interpreted as a different time signature. The end of the song is in 7/4 time, which Spotify picks up on. It is one of the more 'complex' tracks when strictly looking at tempo RMS.

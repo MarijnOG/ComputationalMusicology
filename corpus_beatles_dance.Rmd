@@ -1,11 +1,12 @@
 ---
 title: "Dancing to the Beatles compared to my corpus"
+author: "Marijn Oude Groeneger"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
 ---
 
-```{r}
+```{r setup_dance}
 library(tidyverse)
 library(spotifyr)
 library(ggplot2)
@@ -31,7 +32,7 @@ beatles_relevant <- beatles_relevant[, !(names(beatles_relevant) %in% c('track.a
 ```
 Row {data-height=100}
 ------------------------------------------------
-When looking at any corpus of music, an interesting point of debate can be the measure of how easy this music is to dance to, or perhaps, how inclined one naturally feels to move to the rhythm upon hearing a tune. To this end, Spotify provides an API endpoint for previously discussed features, one of which being 'danceability'. To both gain a better understanding of my chosen corpus of music, as well as to gain insight into this parameter, two figures have been displayed.
+When looking at any corpus of music, an interesting point of debate can be the measure of how easy this music is to dance to, or perhaps, how inclined one naturally feels to move to the rhythm upon hearing a tune. To this end, Spotify provides an API endpoint for previously discussed features, one of which being 'danceability'. To both gain a better understanding of my chosen corpus of music, as well as to gain insight into this parameter, two figures have been displayed. These figures also include the energy and the tempo, two more metrics for the perceived intensity of a music track.
 
 Row
 ------------------------------------------------

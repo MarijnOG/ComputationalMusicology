@@ -1,0 +1,98 @@
+---
+title: "Clustering"
+author: "Marijn Oude Groeneger"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup_clustering}
+library(tidyverse)
+library(spotifyr)
+library(plotly)
+library(compmus)
+library(protoclust)
+library(cowplot)
+library(tidymodels)
+library(ggdendro)
+library(heatmaply)
+```
+
+
+```{r Dendrogram}
+corpus <-
+  get_playlist_audio_features("", "2xMkwo39GHbC6An1SLv3A0?si=38e568f8d86c48a3") |>
+  add_audio_analysis() |>
+  mutate(segments = map2(segments, key, compmus_c_transpose)) |>
+  mutate(
+    pitches =
+      map(
+        segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      ),
+    timbre =
+      map(
+        segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  ) |>
+  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
+  mutate_at(vars(pitches, timbre), map, bind_rows) |>
+  unnest(cols = c(pitches, timbre))
+```
+
+```{r Dirty fix for duplicate name}
+corpus <- corpus %>%
+  mutate(track.name = if_else(track.id == '7lu0eXWcw190GRCb98U9Q8', 'Camp Adventure (Management)', track.name))
+```
+
+```{r Juice}
+corpus_juice <-
+  recipe(
+    track.name ~
+      danceability +
+      energy +
+      loudness +
+      speechiness +
+      acousticness +
+      instrumentalness +
+      liveness +
+      valence +
+      tempo +
+      duration +
+      c01 + c02 + c03 + c04 + c05 + c06 +
+      c07 + c08 + c09 + c10 + c11 + c12,
+    data = corpus
+  ) |>
+  step_range(all_predictors()) |>
+  prep(corpus |> mutate(track.name = str_trunc(track.name, 20))) |>
+  juice() |>
+  column_to_rownames("track.name")
+```
+
+Row {.sidebar}
+------------------------------------------------
+When clustering, it can be important to consider what features to include. For these dendrograms, the choice was made to include all features except for the pitch (class), as the author does not believe this to be relevant. The dendrograms
+
+Row
+------------------------------------------------
+### Dendrogram heatmap (Gower's Distance)
+```{r Plot dendo}
+ggheatmap(
+  corpus_juice,
+  hclustfun = protoclust,
+  dist_method = "manhattan"
+)
+```
+
+### Average Dendrogram (Euclidian distance)
+```{r}
+corpus_dist <- dist(corpus_juice, method = "euclidian")
+corpus_dist |> 
+  hclust(method = "average") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram(rotate = TRUE)
+```
+

@@ -1,11 +1,12 @@
 ---
 title: "Temporal Page"
+author: "Marijn Oude Groeneger"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
 ---
 
-```{r setup}
+```{r setup_camp_adventure}
 library(tidyverse)
 library(spotifyr)
 library(ggplot2)
@@ -13,10 +14,16 @@ library(plotly)
 library(compmus)
 ```
 
-### Twin Galaxies version
+Row {data-height=150}
+------------------------------------------------
+For the sake of the assignment and my amusement, we compare the tempograms of two different versions of the same track: Camp Adventure by Delta Sleep. The first version is from the album 'Management' and is from 2013, while the second version comes from the album 'Twin Galaxies' (2015).
+
+Row
+------------------------------------------------
+### Twin Galaxies (2015)
 ```{r TG_Camp_Adventure}
 get_tidy_audio_analysis('1zvAP1uHLSDblWvv25rtad') |> 
-  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) |> 
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |> 
   ggplot(aes(x = time, y = bpm, fill = power)) + 
   geom_raster() + 
   scale_fill_viridis_c(guide = 'none') +
@@ -24,13 +31,19 @@ get_tidy_audio_analysis('1zvAP1uHLSDblWvv25rtad') |>
   theme_classic()
 ```
 
-### Management version 
+### Management (2013)
 ```{r M_Camp_Adventure}
 get_tidy_audio_analysis('7lu0eXWcw190GRCb98U9Q8') |> 
-  tempogram(window_size = 8, hop_size = 1, cyclic = FALSE) |> 
+  tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |> 
   ggplot(aes(x = time, y = bpm, fill = power)) + 
   geom_raster() + 
   scale_fill_viridis_c(guide = 'none') +
   labs(x = 'Time (s)', y = 'Tempo (BPM)') +
   theme_classic()
 ```
+
+Row {data-height=250}
+------------------------------------------------
+The more popular version from 2015 appears a bit more temporally consistent. This can be explained by the distinct 'live' sound of the Management version, which Spotify attributes the value of 37% against the later version's 30%. The acousticness is also much higher for the Management version at 92% against 15%.
+
+Both these versions are considered by Spotify to belong to the following genres: math rock, math pop, British math rock, Brighton indie, while Wikipedia attributes them both to Indie rock and math rock. While looking at these genres one may conclude that geographical information is also used to classify genres, Delta Sleep originated in Canterbury, Canada.
