@@ -51,4 +51,9 @@ Rhythmic Complexity Analyses
 ```{r Rhythmic Complexity Analyses, child = 'tempo.Rmd'}
 ```
 
+Conclusion
+=================================================
+```{r Conclusion, child = 'conclusion.Rmd'}
+```
+
 
